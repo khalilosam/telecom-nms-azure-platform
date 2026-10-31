@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telecom NMS - Network Operations Center (NOC)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+    <header class="noc-header">
+      <div class="brand">
+        <span class="brand-icon">📡</span>
+        <div class="brand-text">
+          <h1>TELECOM NMS PLATFORM</h1>
+          <span class="subtext">Azure Production Cloud | 4G/5G RAN & Core Monitoring</span>
+        </div>
+      </div>
+      <div class="header-status">
+        <div class="status-pill status-healthy">
+          <span class="pulse-dot"></span>
+          <span>NMS Backend: ONLINE</span>
+        </div>
+        <div class="status-pill">
+          <span>Azure Region: East US 2</span>
+        </div>
+        <div class="status-pill">
+          <span id="clock">00:00:00 UTC</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <!-- KPI Stats Bar -->
+      <section class="kpi-grid">
+        <div class="kpi-card card-blue">
+          <div class="kpi-label">TOTAL CELL SITES</div>
+          <div class="kpi-value" id="kpi-total-sites">--</div>
+          <div class="kpi-trend">Coverage across 4 Regional Hubs</div>
+        </div>
+        <div class="kpi-card card-green">
+          <div class="kpi-label">SITES OPERATIONAL</div>
+          <div class="kpi-value" id="kpi-online-sites">--</div>
+          <div class="kpi-trend">99.98% Network SLA</div>
+        </div>
+        <div class="kpi-card card-red">
+          <div class="kpi-label">CRITICAL ALARMS</div>
+          <div class="kpi-value" id="kpi-critical-alarms">0</div>
+          <div class="kpi-trend">Requires Immediate Dispatch</div>
+        </div>
+        <div class="kpi-card card-amber">
+          <div class="kpi-label">MAJOR ALARMS</div>
+          <div class="kpi-value" id="kpi-major-alarms">0</div>
+          <div class="kpi-trend">Under NOC Investigation</div>
+        </div>
+        <div class="kpi-card card-purple">
+          <div class="kpi-label">AVG RRC CONNECTED USERS</div>
+          <div class="kpi-value" id="kpi-rrc-users">18,450</div>
+          <div class="kpi-trend">Active RAN Bearers</div>
+        </div>
+      </section>
+
+      <!-- Main Columns: Sites Table & Live Alarms -->
+      <div class="content-split">
+        <!-- Left: Cell Sites Inventory -->
+        <section class="panel site-panel">
+          <div class="panel-header">
+            <h2>🌍 Managed Cell Sites (BTS / NodeB / eNodeB / gNodeB)</h2>
+            <div class="controls">
+              <select id="tech-filter" class="form-select">
+                <option value="ALL">All Technologies</option>
+                <option value="5G-NR">5G-NR</option>
+                <option value="4G-LTE">4G-LTE</option>
+                <option value="3G-UMTS">3G-UMTS</option>
+                <option value="2G-GSM">2G-GSM</option>
+              </select>
+              <select id="region-filter" class="form-select">
+                <option value="ALL">All Regions</option>
+                <option value="East Africa">East Africa (Kenya)</option>
+                <option value="Southern Africa">Southern Africa (Zambia/Namibia/Malawi)</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="data-table" id="sites-table">
+              <thead>
+                <tr>
+                  <th>Site Code</th>
+                  <th>Site Name</th>
+                  <th>Technology</th>
+                  <th>Region</th>
+                  <th>Management IP</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="sites-table-body">
+                <tr><td colspan="7" class="loading">Fetching cell site telemetry...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Right: Active Alarms Stream -->
+        <section class="panel alarm-panel">
+          <div class="panel-header">
+            <h2>🚨 Real-Time Alarm Feed (FM / Fault Management)</h2>
+            <button id="refresh-alarms-btn" class="btn btn-sm">↻ Refresh</button>
+          </div>
+          <div class="alarm-feed" id="alarm-feed-container">
+            <div class="loading">Streaming active fault traps...</div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Bottom Panel: System Architecture & Topology Overview -->
+      <section class="panel arch-panel">
+        <div class="panel-header">
+          <h2>📐 Azure Cloud 3-Tier Infrastructure Topology</h2>
+          <span class="badge badge-azure">Provisioned via Terraform Enterprise Modules</span>
+        </div>
+        <div class="arch-flow">
+          <div class="arch-box">
+            <div class="arch-box-title">LAYER 1: WEB FRONTEND</div>
+            <div class="arch-box-desc">Azure Blob Storage Static Website ($web) with HTTPS custom endpoint & Global CDN</div>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-box">
+            <div class="arch-box-title">LAYER 2: BACKEND APPLICATION</div>
+            <div class="arch-box-desc">Linux Virtual Machine (RHEL 9) inside Azure VNet / App Subnet + FastAPI + Nginx + systemd</div>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-box">
+            <div class="arch-box-title">LAYER 3: DATA PERSISTENCE</div>
+            <div class="arch-box-desc">Azure Database for PostgreSQL Flexible Server inside Private Subnet (VNet-Integrated)</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="noc-footer">
+      <div>Telecom NMS Platform v2.4.0-prod | Architected & Engineered by <strong>Osama Khalil</strong></div>
+      <div>Source Code: <a href="https://github.com/khalilosam/telecom-nms-azure-platform" target="_blank">github.com/khalilosam/telecom-nms-azure-platform</a></div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
